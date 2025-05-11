@@ -42,6 +42,7 @@ def main(args):
     os.makedirs("logs", exist_ok=True)
     os.makedirs("plots", exist_ok=True)
     os.makedirs(os.path.join("models", "saved"), exist_ok=True)
+    os.makedirs(os.path.join("models", "checkpoints"), exist_ok=True)
     
     # Visualize sample images and class distribution if requested
     if args.explore_data:
@@ -52,7 +53,15 @@ def main(args):
     # Train model if requested
     if args.train:
         logger.info("Training model...")
-        model, history = train_model()
+        # Check if resuming training
+        if args.resume:
+            logger.info(f"Resuming training from epoch {args.start_epoch}")
+            model, history = train_model(
+                start_epoch=args.start_epoch, 
+                checkpoint_path=args.checkpoint
+            )
+        else:
+            model, history = train_model()
     else:
         model = None
     
@@ -80,6 +89,9 @@ if __name__ == "__main__":
     parser.add_argument("--visualize", action="store_true", help="Visualize results")
     parser.add_argument("--explore-data", action="store_true", help="Explore and visualize the dataset")
     parser.add_argument("--all", action="store_true", help="Run the entire pipeline")
+    parser.add_argument("--resume", action="store_true", help="Resume training from checkpoint")
+    parser.add_argument("--checkpoint", type=str, help="Path to checkpoint file to resume from")
+    parser.add_argument("--start-epoch", type=int, default=0, help="Epoch to start from (if resuming)")
     
     args = parser.parse_args()
     

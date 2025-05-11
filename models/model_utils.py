@@ -29,13 +29,28 @@ def get_callbacks(log_dir="logs"):
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
     
-    # Model checkpoint to save best model
-    checkpoint = ModelCheckpoint(
+    # Create checkpoints directory if it doesn't exist
+    checkpoints_dir = os.path.join("models", "checkpoints")
+    if not os.path.exists(checkpoints_dir):
+        os.makedirs(checkpoints_dir)
+    
+    # Save best model
+    best_model_checkpoint = ModelCheckpoint(
         MODEL_PATH,
         monitor='val_accuracy',
         verbose=1,
         save_best_only=True,
         mode='max'
+    )
+    
+    # Save model every 5 epochs
+    periodic_checkpoint = ModelCheckpoint(
+        os.path.join(checkpoints_dir, "model_epoch_{epoch:02d}.h5"),
+        monitor='val_loss',
+        verbose=1,
+        save_best_only=False,
+        save_weights_only=False,
+        save_freq=5  # Save every 5 epochs (newer TF/Keras versions)
     )
     
     # Early stopping to prevent overfitting
@@ -63,7 +78,7 @@ def get_callbacks(log_dir="logs"):
         write_graph=True
     )
     
-    return [checkpoint, early_stopping, reduce_lr, tensorboard]
+    return [best_model_checkpoint, periodic_checkpoint, early_stopping, reduce_lr, tensorboard]
 
 
 def model_summary_to_file(model, file_path="model_summary.txt"):

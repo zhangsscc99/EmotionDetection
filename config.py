@@ -1,3 +1,4 @@
+
 """
 Configuration file for the Facial Emotion Recognition project.
 Contains paths, hyperparameters, and other configuration settings.
