@@ -1,4 +1,3 @@
-
 """
 Configuration file for the Facial Emotion Recognition project.
 Contains paths, hyperparameters, and other configuration settings.
@@ -25,6 +24,8 @@ MODEL_DIR = os.path.join("models", "saved")
 if not os.path.exists(MODEL_DIR):
     os.makedirs(MODEL_DIR)
 MODEL_PATH = os.path.join(MODEL_DIR, "emotion_model.h5")
+# Ensure forward slashes for cross-platform compatibility
+MODEL_PATH = MODEL_PATH.replace('\\', '/')
 
 # Class mapping
 EMOTION_LABELS = {

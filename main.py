@@ -10,7 +10,7 @@ import tensorflow as tf
 
 from config import TRAIN_DIR, TEST_DIR
 from utils.utils import setup_logging, set_memory_growth, get_hardware_info
-from training.train import train_model
+from training.train import train_model, ensure_dir_exists
 from evaluation.evaluate import evaluate_model
 from visualization.visualize import (
     plot_training_history, 
@@ -39,10 +39,10 @@ def main(args):
     logger.info(f"Hardware information: {hw_info}")
     
     # Create directories
-    os.makedirs("logs", exist_ok=True)
-    os.makedirs("plots", exist_ok=True)
-    os.makedirs(os.path.join("models", "saved"), exist_ok=True)
-    os.makedirs(os.path.join("models", "checkpoints"), exist_ok=True)
+    ensure_dir_exists("logs")
+    ensure_dir_exists("plots")
+    ensure_dir_exists(os.path.join("models", "saved"))
+    ensure_dir_exists(os.path.join("models", "checkpoints"))
     
     # Visualize sample images and class distribution if requested
     if args.explore_data:

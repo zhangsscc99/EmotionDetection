@@ -16,6 +16,18 @@ from models.cnn_model import build_emotion_model
 from models.model_utils import get_callbacks, model_summary_to_file
 
 
+def ensure_dir_exists(directory):
+    """
+    Ensure a directory exists, creating it if necessary.
+    
+    Args:
+        directory: Directory path to check/create
+    """
+    if not os.path.exists(directory):
+        os.makedirs(directory, exist_ok=True)
+        print(f"Created directory: {directory}")
+
+
 def train_model(start_epoch=0, checkpoint_path=None):
     """
     Train the facial emotion recognition model.
@@ -27,6 +39,11 @@ def train_model(start_epoch=0, checkpoint_path=None):
     Returns:
         Trained model and training history
     """
+    # Ensure directories exist
+    ensure_dir_exists(os.path.join("models", "saved"))
+    ensure_dir_exists(os.path.join("models", "checkpoints"))
+    ensure_dir_exists("logs")
+    
     print("Creating data generators...")
     train_generator, validation_generator, test_generator = create_data_generators(
         TRAIN_DIR, TEST_DIR
@@ -34,6 +51,8 @@ def train_model(start_epoch=0, checkpoint_path=None):
     
     if checkpoint_path and os.path.exists(checkpoint_path):
         print(f"Loading model from checkpoint: {checkpoint_path}")
+        # Ensure checkpoint path uses forward slashes
+        checkpoint_path = checkpoint_path.replace('\\', '/')
         model = tf.keras.models.load_model(checkpoint_path)
         print("Model loaded successfully.")
     else:

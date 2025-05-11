@@ -43,9 +43,13 @@ def get_callbacks(log_dir="logs"):
         mode='max'
     )
     
-    # Save model every 5 epochs
+    # Save model every 5 epochs - using proper path formatting
+    checkpoint_path = os.path.join(checkpoints_dir, "model_epoch_{epoch:02d}.h5")
+    # Ensure forward slashes for file paths (works on both Windows and Unix)
+    checkpoint_path = checkpoint_path.replace('\\', '/')
+    
     periodic_checkpoint = ModelCheckpoint(
-        os.path.join(checkpoints_dir, "model_epoch_{epoch:02d}.h5"),
+        checkpoint_path,
         monitor='val_loss',
         verbose=1,
         save_best_only=False,
