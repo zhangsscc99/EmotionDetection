@@ -1,0 +1,68 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Virtual environments
+venv/
+env/
+ENV/
+.env/
+.venv/
+.conda/
+
+# Model files and checkpoints
+*.h5
+*.hdf5
+*.pb
+*.ckpt
+*.pth
+*.pt
+*.bin
+models/saved/
+models/checkpoints/
+
+# Training data and results
+training_history*.json
+evaluation_results.json
+model_summary.txt
+
+# Logs and plots
+logs/
+plots/
+*.log
+*.png
+*.jpg
+*.jpeg
+*.pdf
+
+# OS specific files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+.ipynb_checkpoints/
+
+# Large binary files
+miniconda.exe
+*.exe
+*.data
+*.zip
+*.tar
+*.gz
+
+# Project specific
+temp/
+.history/
+data/raw/
+data/processed/ 
