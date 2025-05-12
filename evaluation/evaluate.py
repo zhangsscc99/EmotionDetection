@@ -14,6 +14,30 @@ from sklearn.metrics import classification_report, confusion_matrix
 from tensorflow.keras.models import load_model
 
 
+def convert_to_serializable(obj):
+    """
+    Convert NumPy types to Python native types for JSON serialization.
+    
+    Args:
+        obj: Object to convert
+        
+    Returns:
+        JSON serializable object
+    """
+    if isinstance(obj, (np.integer, np.int32, np.int64)):
+        return int(obj)
+    elif isinstance(obj, (np.floating, np.float32, np.float64)):
+        return float(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif isinstance(obj, list):
+        return [convert_to_serializable(item) for item in obj]
+    elif isinstance(obj, dict):
+        return {key: convert_to_serializable(value) for key, value in obj.items()}
+    else:
+        return obj
+
+
 def evaluate_model(model=None):
     """
     Evaluate the trained model on the test set.
@@ -70,8 +94,11 @@ def evaluate_model(model=None):
         "confusion_matrix": conf_matrix.tolist()
     }
     
+    # Ensure results are serializable
+    serializable_results = convert_to_serializable(results)
+    
     with open("evaluation_results.json", "w") as f:
-        json.dump(results, f, indent=4)
+        json.dump(serializable_results, f, indent=4)
     
     return results
 

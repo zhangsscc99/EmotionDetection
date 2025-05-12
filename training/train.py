@@ -7,6 +7,7 @@ import sys
 import time
 import json
 import argparse
+import numpy as np
 import tensorflow as tf
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -26,6 +27,30 @@ def ensure_dir_exists(directory):
     if not os.path.exists(directory):
         os.makedirs(directory, exist_ok=True)
         print(f"Created directory: {directory}")
+
+
+def convert_to_serializable(obj):
+    """
+    Convert NumPy types to Python native types for JSON serialization.
+    
+    Args:
+        obj: Object to convert
+        
+    Returns:
+        JSON serializable object
+    """
+    if isinstance(obj, (np.integer, np.int32, np.int64)):
+        return int(obj)
+    elif isinstance(obj, (np.floating, np.float32, np.float64)):
+        return float(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif isinstance(obj, list):
+        return [convert_to_serializable(item) for item in obj]
+    elif isinstance(obj, dict):
+        return {key: convert_to_serializable(value) for key, value in obj.items()}
+    else:
+        return obj
 
 
 def train_model(start_epoch=0, checkpoint_path=None):
@@ -90,7 +115,9 @@ def train_model(start_epoch=0, checkpoint_path=None):
     
     # Save training history
     history_path = f'training_history_{time.strftime("%Y%m%d_%H%M%S")}.json'
+    # Convert history to serializable format
     history_dict = history.history
+    serializable_history = convert_to_serializable(history_dict)
     
     # If resuming training and history file exists, try to merge histories
     if start_epoch > 0 and os.path.exists('training_history.json'):
@@ -100,17 +127,18 @@ def train_model(start_epoch=0, checkpoint_path=None):
                 
             # Merge previous history with current history
             for key in previous_history:
-                if key in history_dict:
-                    history_dict[key] = previous_history[key] + history_dict[key]
+                if key in serializable_history:
+                    serializable_history[key] = previous_history[key] + serializable_history[key]
         except Exception as e:
             print(f"Warning: Could not merge history files. Error: {e}")
     
+    # Save serializable history
     with open(history_path, 'w') as f:
-        json.dump(history_dict, f)
+        json.dump(serializable_history, f)
     
     # Also save to standard filename for compatibility
     with open('training_history.json', 'w') as f:
-        json.dump(history_dict, f)
+        json.dump(serializable_history, f)
     
     print(f"Training history saved to {history_path} and training_history.json")
     print(f"Final model saved to {MODEL_PATH}")

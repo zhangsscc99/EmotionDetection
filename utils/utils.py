@@ -6,9 +6,34 @@ import os
 import sys
 import time
 import logging
+import numpy as np
 from datetime import datetime
 import tensorflow as tf
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+
+def convert_to_serializable(obj):
+    """
+    Convert NumPy types to Python native types for JSON serialization.
+    
+    Args:
+        obj: Object to convert
+        
+    Returns:
+        JSON serializable object
+    """
+    if isinstance(obj, (np.integer, np.int32, np.int64)):
+        return int(obj)
+    elif isinstance(obj, (np.floating, np.float32, np.float64)):
+        return float(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif isinstance(obj, list):
+        return [convert_to_serializable(item) for item in obj]
+    elif isinstance(obj, dict):
+        return {key: convert_to_serializable(value) for key, value in obj.items()}
+    else:
+        return obj
 
 
 def setup_logging(log_dir="logs", log_level=logging.INFO):
